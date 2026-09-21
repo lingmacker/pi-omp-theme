@@ -219,11 +219,11 @@ export function createBuiltinSegments(): ReadonlyMap<StatusSegmentId, StatusSegm
 			true,
 		),
 		segment("path", 80, ({ snapshot, theme }) => {
-			// omp prints the working directory in full; the basename alone loses which
-			// checkout you are in when several share a name.
-			const name = snapshot.cwd;
+			// 状态栏只保留项目目录名，避免工作目录挤占模型和 Git 信息。
+			const path = snapshot.cwd?.replace(/[\\/]+$/, "");
+			const name = path?.split(/[\\/]/).at(-1) || path;
 			return {
-				visible: Boolean(snapshot.cwd),
+				visible: Boolean(name),
 				content: theme.apply("path", `${theme.glyph("path")} ${name ?? ""}`),
 				compactContent: theme.apply("path", name ?? ""),
 				truncatable: true,

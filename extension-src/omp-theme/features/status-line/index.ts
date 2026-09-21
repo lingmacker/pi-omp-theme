@@ -301,7 +301,7 @@ export function installStatusLine(options: StatusLineInstallOptions): StatusLine
 			return;
 		}
 		if (safeWidget(options.host, PRIMARY_WIDGET_KEY, factory(false), placementFor(config))) claim(PRIMARY_WIDGET_KEY);
-		if (safeWidget(options.host, SECONDARY_WIDGET_KEY, factory(true), "belowEditor")) claim(SECONDARY_WIDGET_KEY);
+		if (safeWidget(options.host, SECONDARY_WIDGET_KEY, factory(true), placementFor(config))) claim(SECONDARY_WIDGET_KEY);
 		mountFooter();
 	};
 	function clear(key: string): void {
