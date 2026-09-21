@@ -24,7 +24,7 @@ test("claude preset resolves its coordinated editor and status composition", () 
 	assert.equal(result.config.editor.frame, "claude");
 	assert.equal(result.config.statusLine.separator, "|");
 	assert.deepEqual(result.config.statusLine.layout, {
-		left: ["model_effort", "path", "git", "claude_context"],
+		left: ["model_effort", "path", "git", "claude_context", "extension_statuses"],
 		right: [],
 		secondary: [],
 	});
@@ -146,11 +146,23 @@ test("claude status keeps context visible and respects narrow terminal widths", 
 	}
 });
 
-test("omp and claude presets do not inherit default secondary status items", () => {
-	for (const preset of ["omp", "claude"] as const) {
-		const { config } = resolveConfigDetailed({ global: { preset } });
-		assert.deepEqual(config.statusLine.layout.secondary, []);
-		assert.ok(!config.statusLine.layout.left.includes("extension_statuses"));
-		assert.ok(!config.statusLine.layout.right.includes("extension_statuses"));
-	}
+test("claude preset appends pi-usage status to the main status row", () => {
+	const { config } = resolveConfigDetailed({ global: { preset: "claude" } });
+	const rendered = renderStatus(
+		config.statusLine.layout,
+		{ extensionStatuses: [{ key: "usage", value: "codex 80% left" }] },
+		120,
+		{ separator: config.statusLine.separator, segments: createBuiltinSegments(), theme },
+	);
+
+	assert.equal(rendered.secondary, undefined);
+	assert.equal(rendered.primary, "codex 80% left");
+	assert.ok(rendered.lines.includes("codex 80% left"));
+});
+
+test("omp preset does not inherit default secondary status items", () => {
+	const { config } = resolveConfigDetailed({ global: { preset: "omp" } });
+	assert.deepEqual(config.statusLine.layout.secondary, []);
+	assert.ok(!config.statusLine.layout.left.includes("extension_statuses"));
+	assert.ok(!config.statusLine.layout.right.includes("extension_statuses"));
 });

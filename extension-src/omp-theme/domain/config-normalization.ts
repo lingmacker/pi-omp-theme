@@ -68,7 +68,7 @@ export const DEFAULT_CONFIG: NormalizedPiOmpThemeConfig = Object.freeze({
 	compatibility: Object.freeze({
 		allowSafePatches: true,
 		allowCorePatches: false,
-		preferExistingEditor: true,
+		preferExistingEditor: false,
 		preferExistingFooter: true,
 	}),
 	debug: false,

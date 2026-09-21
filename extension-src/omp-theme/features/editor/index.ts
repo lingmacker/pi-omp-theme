@@ -311,7 +311,12 @@ export class StyledEditor extends CustomEditor implements EditorComponent {
 			}
 			return [border("─".repeat(width)), ...renderedBody, ...dropdownLines, border("─".repeat(width))];
 		}
-		if (style === "native") return super.render(width).map((line) => widthSafe(line, width));
+		if (style === "native") {
+			const lines = super.render(width);
+			const bodyIndex = lines.findIndex((line) => !isNativeBorderLine(line));
+			if (bodyIndex >= 0) lines[bodyIndex] = widthSafe(`❯ ${lines[bodyIndex] ?? ""}`, width);
+			return lines.map((line) => widthSafe(line, width));
+		}
 
 		const prompt = this.prompt(width);
 		const promptWidth = widthOf(prompt) + 1;
@@ -368,11 +373,6 @@ export class StyledEditor extends CustomEditor implements EditorComponent {
 		}
 		const configured = this.config.theme.glyphs.prompt;
 		if (configured) return configured;
-		// A frame carrying the status already marks where input begins, so omp's
-		// box shape spends no cell on a prompt glyph
-		// (tui/components/composer/box.ts — `defaultPromptGutter: undefined`).
-		// Only its borderless/claude/rule shapes keep one.
-		if (width !== undefined && editorHostsBorderStatusAt(this.config, width)) return "";
 		return this.semantic.mode === "ascii" ? ">" : "❯";
 	}
 
